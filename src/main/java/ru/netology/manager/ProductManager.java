@@ -35,7 +35,7 @@ public class ProductManager {
         return items;
     }
 
-    public boolean matches(Product product, String search) {
+    private boolean matches(Product product, String search) {
         boolean ok = false;
         if (product instanceof Book) {
             ok = ((Book) product).getAuthor().contains(search);
@@ -43,12 +43,6 @@ public class ProductManager {
             ok = ((Smartphone) product).getProducer().contains(search);
         }
         return ok || product.getName().contains(search);
-    }
-
-    // for tests:
-
-    ProductRepository getRepository() {
-        return repository;
     }
 
 }

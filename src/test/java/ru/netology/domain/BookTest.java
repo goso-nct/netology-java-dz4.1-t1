@@ -6,15 +6,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BookTest {
 
-    Book b0 = new Book();
-    Book b1 = new Book( 1, "One", 111, "mr. First");
-    Book b2 = new Book( 2, "Two", 222, "mr. Second");
-    Book b1copy = new Book( 1, "One", 111, "mr. First");
+    Book b1 = new Book( 1, "b1", 111, "mr. First");
+    Book b2 = new Book( 2, "b2", 222, "mr. Second");
+    Book b1copy = new Book( 1, "b1", 111, "mr. First");
 
     @Test
     void testEquals() {
+        assertEquals(b1, b1);
         assertEquals(b1, b1copy);
         assertNotEquals(b1, b2);
+        assertNotEquals(b1, null);
+        assertNotEquals(b1, "b1");
     }
 
     @Test
@@ -25,7 +27,7 @@ class BookTest {
 
     @Test
     void testToString() {
-        String expected = "Book{id=1, name='One', price=111, author='mr. First'}";
+        String expected = "Book{id=1, name='b1', price=111, author='mr. First'}";
         String actual = b1.toString();
         assertEquals(expected, actual);
     }
@@ -42,4 +44,5 @@ class BookTest {
     public void toString_shouldUseOverrided() {
         Product p = b1;
         assertEquals(p.toString(), b1.toString());
-    }}
+    }
+}

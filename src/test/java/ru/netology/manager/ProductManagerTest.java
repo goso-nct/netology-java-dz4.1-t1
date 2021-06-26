@@ -1,6 +1,5 @@
 package ru.netology.manager;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import ru.netology.domain.Book;
@@ -9,11 +8,14 @@ import ru.netology.domain.Smartphone;
 import ru.netology.exception.NullRepositoryException;
 import ru.netology.repository.ProductRepository;
 
+import java.lang.reflect.Method;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProductManagerTest {
 
     ProductRepository repository = new ProductRepository();
+    ProductManager testManager = new ProductManager(repository);
 
     Product p1 = new Product(0, "p0", 10);
     Book b1 = new Book(1, "first book mr. First", 111, "mr. First");
@@ -26,6 +28,9 @@ class ProductManagerTest {
     Smartphone s5 = new Smartphone(8, "iphone 11 pro", 55, "Apple!!");
     Smartphone s6 = new Smartphone(9, "iphone sx", 22, "Apple");
 
+    ProductManagerTest() throws NullRepositoryException {
+    }
+
     @Test
     @Disabled
     void ProductManager_shouldNotBeCreated() throws NullRepositoryException {
@@ -33,55 +38,40 @@ class ProductManagerTest {
     }
 
     @Test
-    void ProductManager_shouldGenerateException() {
+    void ProductManager_nullShouldGenerateException() {
         assertThrows(NullRepositoryException.class, ()-> {
                     ProductManager manager = new ProductManager(null);
                 });
     }
 
     @Test
-    @SneakyThrows
-    void add_shouldAdd() {
-        ProductManager manager = new ProductManager(repository);
-        manager.add(b1);
-        manager.add(b2);
-        manager.add(b3);
-        manager.add(s1);
-        manager.add(s2);
-        assertEquals(5, manager.getRepository().size());
-    }
-
-    @Test
-    @SneakyThrows
-    void add_shouldDontAdd() {
-        repository.setStorage(new Product[]{ b1, b2, b3, s1, s2 });
-        ProductManager manager = new ProductManager(repository);
-        manager.add(b3);
-        assertEquals(5, manager.getRepository().size());
-        manager.add(null);
-        assertEquals(5, manager.getRepository().size());
-    }
-
-    @Test
-    @SneakyThrows
     void searchBy_shouldFind() {
-        repository.setStorage(new Product[]{ b1, b2, b3, s1, s2, s3, s4, s5, s6 });
-        ProductManager manager = new ProductManager(repository);
+        testManager.add(b1); testManager.add(b2); testManager.add(b3);
+        testManager.add(s1); testManager.add(s2); testManager.add(s3);
+        testManager.add(s4); testManager.add(s5); testManager.add(s6);
         Product[] expected = new Product[]{ b3, s1, s2, s4 };
-        Product[] actual = manager.searchBy("2");
+        Product[] actual = testManager.searchBy("2");
         assertArrayEquals(expected, actual);
         expected = new Product[]{ b2, s2, s3, s5 };
-        actual = manager.searchBy("!!");
+        actual = testManager.searchBy("!!");
         assertArrayEquals(expected, actual);
     }
 
     @Test
-    @SneakyThrows
-    void searchBy_shouldDontFind() {
-        repository.setStorage(new Product[]{ b1, b2, s1, s2, s3, p1 });
-        ProductManager manager = new ProductManager(repository);
-        Product[] actual = manager.searchBy("*");
+    void searchBy_shouldNotFind() {
+        testManager.add(b1); testManager.add(b2);
+        testManager.add(s1); testManager.add(s2);
+        Product[] actual = testManager.searchBy("*");
         assertNull(actual);
+    }
+
+    @Test
+    void matches() throws Exception {
+        ProductManager testManager = new ProductManager(repository);
+        Method method = ProductManager.class.getDeclaredMethod("matches", Product.class, String.class);
+        method.setAccessible(true);
+        boolean b = (boolean) method.invoke(testManager,p1, "p0");
+        assertTrue(b);
     }
 
 }
